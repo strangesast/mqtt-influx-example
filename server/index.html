@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>accelerometer mqtt</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+      body, html {
+        height: 100%;
+        background: white;
+      }
+      body {
+        margin: 0;
+      }
+      canvas {
+      }
+    </style>
+  </head>
+  <body>
+    <form onsubmit="return false;">
+      <label for="radio-type-click">Click</label>
+      <input id="radio-type-click" checked type="radio" name="type" value="click">
+      <label for="radio-type-mousemove">MouseMove</label>
+      <input id="radio-type-mousemove" type="radio" name="type" value="mousemove">
+    </form>
+    <canvas></canvas>
+    <script>
+      const rgbToHex = rgb => `#${rgb.map(v => v.toString(16).padStart(2, '0')).join('')}`;
+      const url = `ws:${location.origin.slice(location.protocol.length)}/ws`;
+      const socket = new WebSocket(url);
+      let mode = 'click';
+
+      
+      let debounce = false;
+      const send = (msg) => {
+        if (!debounce) {
+          socket.send(msg);
+          debounce = true;
+          setTimeout(() => debounce = false, 50);
+        }
+      }
+      const clickListener = (e) => {
+        const hex = getPosColor(e);
+        if (!cancelled) {
+          send(hex);
+        }
+      };
+
+      const canvas = document.querySelector('canvas');
+      const [height, width] = [400, 400];
+      canvas.setAttribute('width', width);
+      canvas.setAttribute('height', height);
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createLinearGradient(10, 0, 500, 0);
+      grad.addColorStop(0, 'red');
+      grad.addColorStop(1 / 6, 'orange');
+      grad.addColorStop(2 / 6, 'yellow');
+      grad.addColorStop(3 / 6, 'green');
+      grad.addColorStop(4 / 6, 'blue');
+      grad.addColorStop(5 / 6, 'indigo');
+      grad.addColorStop(1, 'violet');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = 'black';
+
+      const getPosColor = (e) => {
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const data = ctx.getImageData(x, y, 1, 1).data;
+        const rgb = [data[0],data[1],data[2]];
+        const hex = rgbToHex(rgb);
+        // ctx.fillStyle = hex;
+        // ctx.beginPath();
+        // ctx.arc(x, y, 20, 0, Math.PI*2);
+        // ctx.closePath();
+        // ctx.fill();
+        return hex;
+      }
+
+      let loop;
+      let cancelled = false;
+      const cancel = () => {
+        clearTimeout(loop);
+        cancelled = true;
+      };
+
+      socket.onopen = () => {
+        console.log('connected');
+        const changeMode = mode => {
+          if (mode === 'click') canvas.addEventListener('click', clickListener)
+          else canvas.removeEventListener('click', clickListener);
+          if (mode === 'mousemove') canvas.addEventListener('mousemove', clickListener)
+          else canvas.removeEventListener('mousemove', clickListener);
+        }
+        const oninput = e => {
+          if (e.target.value !== mode) {
+            mode = e.target.value;
+            changeMode(mode);
+          }
+        };
+        for (const el of Array.from(document.querySelector('form').querySelectorAll('input'))) {
+          el.oninput = oninput;
+        }
+        changeMode(mode);
+      }
+      socket.onclose = () => {
+        console.log('closed');
+        cancel();
+      };
+    </script>
+  </body>
+</html>

@@ -9,6 +9,23 @@ services:
       - PORT=3000
       - MQTT_PORT=1883
       - MQTT_HOST=mosquitto
+  influx:
+    image: influxdb
+    ports:
+      - 8086:8086
+      - 2003:2003
+    volumes:
+      - './influx:/var/lib/influxdb'
+  telegraf:
+    image: telegraf
+    volumes:
+      - './telegraf.conf:/etc/telegraf/telegraf.conf:ro'
+  chronograf:
+    image: chronograf
+    volumes:
+      - './chronograf:/var/lib/chronograf'
+    ports:
+      - 8888:8888
   mosquitto:
     image: eclipse-mosquitto
     ports:
@@ -16,5 +33,5 @@ services:
       - 9001:9001
     volumes:
       - './mosquitto.conf:/mosquitto/config/mosquitto.conf'
-      - './data:/mosquitto/data'
-      - './log:/mosquitto/log'
+      - './mosquitto/data:/mosquitto/data'
+      - './mosquitto/log:/mosquitto/log'

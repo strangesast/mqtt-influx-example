@@ -24,7 +24,10 @@
       <input id="radio-type-mousemove" type="radio" name="type" value="mousemove">
     </form>
     <canvas></canvas>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
     <script>
+
+      const body = d3.select(document.body);
       const rgbToHex = rgb => `#${rgb.map(v => v.toString(16).padStart(2, '0')).join('')}`;
       const url = `ws:${location.origin.slice(location.protocol.length)}/ws`;
       const socket = new WebSocket(url);

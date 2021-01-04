@@ -1,12 +1,13 @@
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#define PIN D7
 #include "FastLED.h"
-#define NUM_LEDS 6
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
+
 #define STASSID "zagrobelny"
 #define STAPSK  "bridget1"
+#define PIN D7
+#define NUM_LEDS 6
 
 const int led = D4;
 const char *clientID = "esp8266_0";
@@ -15,8 +16,8 @@ const unsigned int interval = 1e3;
 unsigned long last = 0;
 
 int i = 0;
-int offset = 255/NUM_LEDS;
-int l = NUM_LEDS*offset;
+int offset = 255 / NUM_LEDS;
+int l = NUM_LEDS * offset;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -51,6 +52,7 @@ void reconnect() {
     Serial.print(".");
   }
   Serial.println();
+
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection to ");
     Serial.print(mqtt_server);

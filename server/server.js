@@ -22,8 +22,8 @@ const mqttClient = mqtt.connect({servers: [{host: mqttHost, port: mqttPort}]});
 mqttClient.on('connect', () => {
   wss.on('connection', (ws) => {
     console.log(`new connection!`);
-    ws.on('message', (msg) => {
-      mqttClient.publish('leds', msg);
+    ws.on('message', (color) => {
+      mqttClient.publish('leds', JSON.stringify({color, num: 1, date: Date.now()}));
     });
   });
 });

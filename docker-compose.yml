@@ -2,7 +2,7 @@ version: '3.7'
 services:
   server:
     build:
-      context: server
+      context: src/server
     ports:
       - 3000:3000
     environment:
@@ -15,23 +15,32 @@ services:
       - 8086:8086
       - 2003:2003
     volumes:
-      - './influx:/var/lib/influxdb'
+      - ./etc/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf
+      - ./data/influx:/var/lib/influxdb
   telegraf:
     image: telegraf
     volumes:
-      - './telegraf.conf:/etc/telegraf/telegraf.conf:ro'
+      - ./etc/telegraf:/etc/telegraf
   chronograf:
     image: chronograf
-    volumes:
-      - './chronograf:/var/lib/chronograf'
     ports:
       - 8888:8888
+    volumes:
+      - ./data/chronograf:/var/lib/chronograf
+  kapacitor:
+    image: kapacitor
+    ports:
+      - 9092:9092
+    volumes:
+      - ./etc/kapacitor/kapacitor.conf:/etc/kapacitor/kapacitor.conf
+      - ./data/kapacitor:/var/lib/kapacitor
+      - ./etc/kapacitor/load:/etc/kapacitor/load
   mosquitto:
     image: eclipse-mosquitto
     ports:
       - 1883:1883
       - 9001:9001
     volumes:
-      - './mosquitto.conf:/mosquitto/config/mosquitto.conf'
-      - './mosquitto/data:/mosquitto/data'
-      - './mosquitto/log:/mosquitto/log'
+      - ./etc/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./data/mosquitto:/mosquitto/data
+      - ./var/log/mosquitto:/mosquitto/log

@@ -1,5 +1,6 @@
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 #include "FastLED.h"
+#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
@@ -26,10 +27,19 @@ CRGB leds[NUM_LEDS];
 bool colorOverride = false;
 CRGB color;
 
+// use mac address as mqtt client id
+void getMAC() {
+}
+
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
+
+  StaticJsonDocument<256> doc;
+  DeserializationError err = deserializeJson(doc, payload, length);
+  char *color = doc["color"];
+
   char buf[9] = {0};
   if (length > 1) {// && (char)payload[i] == '#') {
     buf[0] = '0';

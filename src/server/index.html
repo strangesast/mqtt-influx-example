@@ -54,7 +54,9 @@
       canvas.setAttribute('width', width);
       canvas.setAttribute('height', height);
       const ctx = canvas.getContext('2d');
-      const grad = ctx.createLinearGradient(10, 0, 500, 0);
+
+      let grad;
+      grad = ctx.createLinearGradient(10, 0, 500, 0);
       grad.addColorStop(0, 'red');
       grad.addColorStop(1 / 6, 'orange');
       grad.addColorStop(2 / 6, 'yellow');
@@ -62,6 +64,12 @@
       grad.addColorStop(4 / 6, 'blue');
       grad.addColorStop(5 / 6, 'indigo');
       grad.addColorStop(1, 'violet');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      grad = ctx.createLinearGradient(0, 10, 0, 500);
+      grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 1)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, width, height);
       ctx.fillStyle = 'black';
@@ -73,11 +81,12 @@
         const data = ctx.getImageData(x, y, 1, 1).data;
         const rgb = [data[0],data[1],data[2]];
         const hex = rgbToHex(rgb);
-        // ctx.fillStyle = hex;
+        ctx.fillStyle = hex;
         // ctx.beginPath();
         // ctx.arc(x, y, 20, 0, Math.PI*2);
         // ctx.closePath();
-        // ctx.fill();
+        ctx.rect(0, 0, 40, 40);
+        ctx.fill();
         return hex;
       }
 

@@ -1,8 +1,8 @@
-from node:slim
+from node
 
 workdir /usr/src/app
-copy package*.json ./
+copy src/server/package*.json ./
 run npm ci --production
-copy . .
+copy src/server .
 
 cmd ["node", "server.js"]
